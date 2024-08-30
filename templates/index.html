@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movie Display</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #121212;
+        color: white;
+        margin: 0;
+        padding: 0;
+      }
+      header {
+        background-color: #1e1e1e;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      header a {
+        color: white;
+        text-decoration: none;
+        margin-right: 20px;
+      }
+      .container {
+        padding: 20px;
+      }
+      .section-title {
+        margin: 20px 0;
+        font-size: 24px;
+      }
+      .movie-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 20px;
+      }
+      .movie-tile {
+        background-color: #1e1e1e;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .movie-tile img {
+        max-width: 100%;
+        border-radius: 4px;
+      }
+      .movie-tile h4 {
+        margin: 10px 0 0;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">Avocato Movies</div>
+      <nav>
+        <a href="#">Home</a>
+      </nav>
+    </header>
+    <div class="container">
+      <section>
+        <h2 class="section-title">Movies</h2>
+        <div class="movie-grid">
+          {% for movie in movies %}
+          <div class="movie-tile">
+            <a href="{{ url_for('movie_detail', movie_id=movie[0]) }}">
+              <img
+                src="{{ url_for('static', filename='movie_posters/' + movie[1] + '.jpg') }}"
+                alt="{{ movie[1].replace('_', ' ').title() }}"
+              />
+              <h4>{{ movie[1].replace('_', ' ').title() }}</h4>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
