@@ -31,6 +31,9 @@
         text-decoration: none;
         margin-right: 20px;
       }
+      .logo img {
+        height: 50px; /* Adjust this size as needed */
+      }
       .container {
         position: relative;
         z-index: 1;
@@ -43,8 +46,7 @@
         width: 100%;
         height: 100%;
         background-image: url("{{ url_for('static', filename='movie_posters/' + movie[2] + '.jpg') }}");
-        background-size: 105%;
-        background-size: cover;
+        background-size: 105%; /* Increase size by 5% */
         background-position: center;
         filter: blur(20px);
         z-index: -1;
@@ -78,7 +80,16 @@
   <body>
     <div class="background-image"></div>
     <header>
-      <div class="logo"><a href="/">Avocato Movies</a></div>
+      <div class="logo">
+        <a href="/"
+          ><img
+            src="{{ url_for('static', filename='logo.png') }}"
+            alt="Avocato Movies Logo"
+        /></a>
+      </div>
+      <nav>
+        <a href="#">Home</a>
+      </nav>
     </header>
     <div class="container">
       <div class="content">
