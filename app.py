@@ -1,5 +1,6 @@
-from flask import Flask, render_template, abort, url_for
+import os
 import sqlite3
+from flask import Flask, render_template, abort, url_for
 
 app = Flask(__name__)
 
@@ -40,7 +41,6 @@ def get_movie_details(movie_id):
 
     return movie, ratings
 
-
 @app.route('/')
 def index():
     movies = get_movies()
@@ -55,4 +55,7 @@ def movie_detail(movie_id):
     return render_template('movie_detail.html', movie=movie, ratings=ratings)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Bind to 0.0.0.0 and use the PORT environment variable if provided
+    host = '0.0.0.0'
+    port = int(os.environ.get('PORT', 10000))  # Default to 10000 if PORT is not set
+    app.run(host=host, port=port)
