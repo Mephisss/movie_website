@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <style>
+        /* Optimized styles with reduced animations and better performance */
         .background-container {
             position: fixed;
             top: 0;
@@ -16,17 +17,18 @@
             height: 100%;
             z-index: -1;
             overflow: hidden;
+            will-change: auto; /* Remove will-change to reduce GPU usage */
         }
 
         .background-image {
-            width: 110%;
-            height: 110%;
+            width: 100%;
+            height: 100%;
             background-image: url("{{ url_for('static', filename='movie_posters/' + movie.poster_filename + '.jpg') }}");
             background-size: cover;
             background-position: center;
-            filter: blur(25px) brightness(0.3);
-            transform: scale(1.1);
-            transition: transform 0.3s ease;
+            background-attachment: fixed;
+            filter: blur(20px) brightness(0.3);
+            /* Removed transform and transition for better performance */
         }
 
         .background-overlay {
@@ -37,7 +39,7 @@
             height: 100%;
             background: linear-gradient(135deg, 
                 rgba(10, 10, 10, 0.9) 0%,
-                rgba(26, 26, 26, 0.8) 50%,
+                rgba(26, 26, 26, 0.85) 50%,
                 rgba(10, 10, 10, 0.95) 100%);
         }
 
@@ -53,12 +55,13 @@
             position: relative;
             border-radius: var(--border-radius);
             overflow: hidden;
-            box-shadow: var(--shadow-heavy);
-            transition: transform 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            /* Simplified transition */
+            transition: transform 0.2s ease;
         }
 
         .poster-container:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px); /* Reduced movement */
         }
 
         .poster-container img {
@@ -94,10 +97,10 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 1rem;
-            background: rgba(37, 37, 37, 0.8);
+            background: rgba(37, 37, 37, 0.9);
             border-radius: 20px;
             font-size: 0.9rem;
-            backdrop-filter: blur(10px);
+            /* Removed backdrop-filter for better performance */
         }
 
         .rt-link {
@@ -108,14 +111,13 @@
             border-radius: 25px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-light);
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.2);
             margin-top: 1rem;
         }
 
         .rt-link:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-heavy);
         }
 
         .stats-summary {
@@ -128,10 +130,10 @@
         .stat-item {
             text-align: center;
             padding: 1.5rem;
-            background: rgba(26, 26, 26, 0.6);
+            background: rgba(26, 26, 26, 0.8);
             border-radius: var(--border-radius);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 107, 53, 0.1);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            /* Removed backdrop-filter */
         }
 
         .stat-value {
@@ -149,12 +151,12 @@
         }
 
         .ratings-section {
-            background: rgba(37, 37, 37, 0.8);
-            backdrop-filter: blur(20px);
+            background: rgba(37, 37, 37, 0.9);
             border-radius: var(--border-radius);
             padding: 2rem;
-            box-shadow: var(--shadow-light);
-            border: 1px solid rgba(255, 107, 53, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            /* Removed backdrop-filter */
         }
 
         .ratings-grid {
@@ -164,11 +166,12 @@
         }
 
         .rating-card {
-            background: rgba(26, 26, 26, 0.8);
-            border: 1px solid rgba(255, 107, 53, 0.2);
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid rgba(255, 107, 53, 0.3);
             border-radius: var(--border-radius);
             padding: 1.5rem;
-            transition: all 0.3s ease;
+            /* Simplified transition */
+            transition: transform 0.2s ease, border-color 0.2s ease;
             position: relative;
             overflow: hidden;
         }
@@ -184,9 +187,8 @@
         }
 
         .rating-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px); /* Reduced movement */
             border-color: var(--accent-color);
-            box-shadow: var(--shadow-light);
         }
 
         .rating-user {
@@ -224,7 +226,8 @@
             height: 100%;
             background: linear-gradient(90deg, var(--accent-color), #ff8c42);
             border-radius: 3px;
-            transition: width 1s ease;
+            /* Faster transition */
+            transition: width 0.6s ease;
         }
 
         .empty-ratings {
@@ -237,7 +240,12 @@
             margin-bottom: 1rem;
         }
 
+        /* Performance optimizations for mobile */
         @media (max-width: 968px) {
+            .background-image {
+                background-attachment: scroll; /* Better performance on mobile */
+            }
+            
             .movie-hero {
                 grid-template-columns: 250px 1fr;
                 gap: 2rem;
@@ -282,10 +290,30 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Disable animations for users who prefer reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .background-image {
+                filter: blur(10px) brightness(0.4); /* Reduced blur */
+            }
+        }
+
+        /* Performance hint for the browser */
+        .poster-container,
+        .rating-card,
+        .stat-item {
+            contain: layout style paint;
+        }
     </style>
 </head>
 <body>
-    <!-- Background -->
+    <!-- Simplified background (no particles on detail page) -->
     <div class="background-container">
         <div class="background-image"></div>
         <div class="background-overlay"></div>
@@ -297,7 +325,7 @@
                 <a href="/">
                     <img src="{{ url_for('static', filename='logo.png') }}" alt="Avocato Movies Logo" onerror="this.style.display='none'">
                 </a>
-                <span class="logo-text">Avocato Movies</span>
+                <span class="logo-text">Movie Detail</span>
             </div>
             <nav>
                 <a href="/" class="back-btn">← Back to Movies</a>
@@ -311,6 +339,7 @@
             <div class="poster-container">
                 <img src="{{ url_for('static', filename='movie_posters/' + movie.poster_filename + '.jpg') }}" 
                      alt="{{ movie.title.replace('_', ' ').title() }}"
+                     loading="lazy"
                      onerror="this.src='{{ url_for('static', filename='placeholder.jpg') }}'">
             </div>
             
@@ -371,7 +400,7 @@
                         <span class="out-of">/10</span>
                     </div>
                     <div class="rating-bar">
-                        <div class="rating-fill" style="width: {{ rating * 10 }}%"></div>
+                        <div class="rating-fill" data-width="{{ rating * 10 }}%" style="width: 0%"></div>
                     </div>
                 </div>
                 {% endfor %}
@@ -386,68 +415,79 @@
     </div>
 
     <script>
-        // Parallax effect for background
-        function setupParallax() {
-            const backgroundImage = document.querySelector('.background-image');
-            
-            window.addEventListener('scroll', () => {
-                const scrolled = window.pageYOffset;
-                const rate = scrolled * -0.5;
-                backgroundImage.style.transform = `translate3d(0, ${rate}px, 0) scale(1.1)`;
-            });
+        // Optimized and simplified JavaScript
+        
+        // Efficient header scroll effect with throttling
+        let ticking = false;
+        function updateHeader() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(10, 10, 10, 0.98)';
+            } else {
+                header.style.background = 'rgba(26, 26, 26, 0.95)';
+            }
+            ticking = false;
         }
 
-        // Animate rating bars on scroll
+        function requestHeaderUpdate() {
+            if (!ticking) {
+                requestAnimationFrame(updateHeader);
+                ticking = true;
+            }
+        }
+
+        window.addEventListener('scroll', requestHeaderUpdate, { passive: true });
+
+        // Optimized rating bar animations using Intersection Observer
         function animateRatingBars() {
             const ratingBars = document.querySelectorAll('.rating-fill');
+            
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        const width = entry.target.style.width;
-                        entry.target.style.width = '0%';
+                        const bar = entry.target;
+                        const width = bar.dataset.width;
+                        
+                        // Use a small delay to ensure smooth animation
                         setTimeout(() => {
-                            entry.target.style.width = width;
-                        }, 100);
+                            bar.style.width = width;
+                        }, 150);
+                        
+                        observer.unobserve(bar); // Stop observing once animated
                     }
                 });
-            }, { threshold: 0.5 });
+            }, { 
+                threshold: 0.3,
+                rootMargin: '0px 0px -10% 0px'
+            });
 
             ratingBars.forEach(bar => observer.observe(bar));
         }
 
-        // Header scroll effect
-        function setupHeaderEffects() {
-            const header = document.querySelector('header');
+        // Optimized image loading
+        function setupImageLoading() {
+            const images = document.querySelectorAll('img[loading="lazy"]');
             
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 100) {
-                    header.style.background = 'rgba(10, 10, 10, 0.98)';
-                } else {
-                    header.style.background = 'rgba(26, 26, 26, 0.95)';
-                }
-            });
-        }
-
-        // Loading animations
-        function setupLoadingAnimations() {
-            const images = document.querySelectorAll('img');
             images.forEach(img => {
-                img.addEventListener('load', () => {
+                if (img.complete) {
                     img.style.opacity = '1';
-                });
-                if (!img.complete) {
+                } else {
                     img.style.opacity = '0';
                     img.style.transition = 'opacity 0.3s ease';
+                    
+                    img.addEventListener('load', () => {
+                        img.style.opacity = '1';
+                    }, { once: true });
                 }
             });
         }
 
-        // Initialize everything
+        // Initialize everything efficiently
         document.addEventListener('DOMContentLoaded', () => {
-            setupParallax();
-            animateRatingBars();
-            setupHeaderEffects();
-            setupLoadingAnimations();
+            setupImageLoading();
+            
+            // Delay rating animation to improve perceived performance
+            setTimeout(animateRatingBars, 300);
         });
     </script>
 </body>
