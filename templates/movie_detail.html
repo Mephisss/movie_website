@@ -3,36 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ movie[0].replace('_', ' ').title() }} - Avocato Movies</title>
+    <title>{{ movie.title.replace('_', ' ').title() }} - Avocato Movies</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-bg: #0a0a0a;
-            --secondary-bg: #1a1a1a;
-            --card-bg: #252525;
-            --accent-color: #ff6b35;
-            --text-primary: #ffffff;
-            --text-secondary: #b3b3b3;
-            --border-radius: 12px;
-            --shadow-light: 0 4px 20px rgba(255, 107, 53, 0.1);
-            --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.4);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--primary-bg);
-            color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Background image with parallax effect */
         .background-container {
             position: fixed;
             top: 0;
@@ -46,7 +21,7 @@
         .background-image {
             width: 110%;
             height: 110%;
-            background-image: url("{{ url_for('static', filename='movie_posters/' + movie[2] + '.jpg') }}");
+            background-image: url("{{ url_for('static', filename='movie_posters/' + movie.poster_filename + '.jpg') }}");
             background-size: cover;
             background-position: center;
             filter: blur(25px) brightness(0.3);
@@ -64,72 +39,6 @@
                 rgba(10, 10, 10, 0.9) 0%,
                 rgba(26, 26, 26, 0.8) 50%,
                 rgba(10, 10, 10, 0.95) 100%);
-        }
-
-        /* Header */
-        header {
-            background: rgba(26, 26, 26, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 107, 53, 0.2);
-            padding: 1rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo img {
-            height: 50px;
-            border-radius: 8px;
-        }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(45deg, var(--accent-color), #ff8c42);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .back-btn {
-            background: rgba(255, 107, 53, 0.1);
-            border: 2px solid var(--accent-color);
-            color: var(--accent-color);
-            padding: 0.5rem 1.5rem;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .back-btn:hover {
-            background: var(--accent-color);
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        /* Main content */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 3rem 2rem;
-            position: relative;
-            z-index: 1;
         }
 
         .movie-hero {
@@ -209,37 +118,48 @@
             box-shadow: var(--shadow-heavy);
         }
 
-        /* Ratings section */
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(26, 26, 26, 0.6);
+            border-radius: var(--border-radius);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 107, 53, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
         .ratings-section {
             background: rgba(37, 37, 37, 0.8);
             backdrop-filter: blur(20px);
             border-radius: var(--border-radius);
             padding: 2rem;
             box-shadow: var(--shadow-light);
-        }
-
-        .section-title {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            position: relative;
-            display: inline-block;
-        }
-
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-color), transparent);
-            border-radius: 2px;
+            border: 1px solid rgba(255, 107, 53, 0.1);
         }
 
         .ratings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1rem;
         }
 
@@ -307,37 +227,16 @@
             transition: width 1s ease;
         }
 
-        /* Stats summary */
-        .stats-summary {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-item {
+        .empty-ratings {
             text-align: center;
-            padding: 1.5rem;
-            background: rgba(26, 26, 26, 0.6);
-            border-radius: var(--border-radius);
-            backdrop-filter: blur(10px);
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--accent-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
+            padding: 3rem;
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        /* Responsive design */
+        .empty-ratings h3 {
+            margin-bottom: 1rem;
+        }
+
         @media (max-width: 968px) {
             .movie-hero {
                 grid-template-columns: 250px 1fr;
@@ -346,6 +245,10 @@
             
             .movie-title {
                 font-size: 2.5rem;
+            }
+            
+            .stats-summary {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -365,47 +268,19 @@
             }
             
             .stats-summary {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
                 gap: 1rem;
             }
             
             .ratings-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .container {
-                padding: 2rem 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .stats-summary {
+                grid-template-columns: 1fr;
             }
-        }
-
-        /* Smooth scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--primary-bg);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent-color);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #ff8c42;
-        }
-
-        /* Loading animation for images */
-        .loading-placeholder {
-            background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
         }
     </style>
 </head>
@@ -424,52 +299,61 @@
                 </a>
                 <span class="logo-text">Avocato Movies</span>
             </div>
-            <a href="/" class="back-btn">← Back to Movies</a>
+            <nav>
+                <a href="/" class="back-btn">← Back to Movies</a>
+                <a href="{{ url_for('top_rated') }}">Top Rated</a>
+            </nav>
         </div>
     </header>
 
     <div class="container">
         <div class="movie-hero">
             <div class="poster-container">
-                <img src="{{ url_for('static', filename='movie_posters/' + movie[2] + '.jpg') }}" 
-                     alt="{{ movie[0].replace('_', ' ').title() }}" 
-                     id="moviePoster">
+                <img src="{{ url_for('static', filename='movie_posters/' + movie.poster_filename + '.jpg') }}" 
+                     alt="{{ movie.title.replace('_', ' ').title() }}"
+                     onerror="this.src='{{ url_for('static', filename='placeholder.jpg') }}'">
             </div>
             
             <div class="movie-info">
-                <h1 class="movie-title" id="movieTitle">{{ movie[0].replace('_', ' ').title() }}</h1>
+                <h1 class="movie-title">{{ movie.title.replace('_', ' ').title() }}</h1>
                 
                 <div class="movie-meta">
                     <div class="meta-item">
                         <span>🎬</span>
                         <span>Movie</span>
                     </div>
+                    {% if movie.avg_rating > 0 %}
                     <div class="meta-item">
                         <span>⭐</span>
-                        <span id="avgRatingMeta">Loading...</span>
+                        <span>{{ movie.avg_rating }}/10</span>
                     </div>
+                    {% endif %}
                     <div class="meta-item">
                         <span>👥</span>
-                        <span id="totalRatingsMeta">{{ ratings|length }} reviews</span>
+                        <span>{{ movie.total_ratings }} review{{ 's' if movie.total_ratings != 1 else '' }}</span>
                     </div>
                 </div>
 
                 <div class="stats-summary">
                     <div class="stat-item">
-                        <div class="stat-value" id="avgRating">-</div>
+                        <div class="stat-value">{{ movie.avg_rating if movie.avg_rating > 0 else '-' }}</div>
                         <div class="stat-label">Average Rating</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value" id="totalRatings">{{ ratings|length }}</div>
+                        <div class="stat-value">{{ movie.total_ratings }}</div>
                         <div class="stat-label">Total Ratings</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value" id="highestRating">-</div>
+                        <div class="stat-value">{{ movie.max_rating if movie.max_rating > 0 else '-' }}</div>
                         <div class="stat-label">Highest Rating</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ movie.min_rating if movie.min_rating > 0 else '-' }}</div>
+                        <div class="stat-label">Lowest Rating</div>
                     </div>
                 </div>
 
-                <a href="{{ movie[1] }}" class="rt-link" id="rtLink" target="_blank">
+                <a href="{{ movie.link }}" class="rt-link" target="_blank" rel="noopener noreferrer">
                     🍅 View on Rotten Tomatoes
                 </a>
             </div>
@@ -477,8 +361,9 @@
 
         <div class="ratings-section">
             <h3 class="section-title">Community Ratings</h3>
-            <div class="ratings-grid" id="ratingsGrid">
-                {% for user, rating in ratings %}
+            {% if ratings %}
+            <div class="ratings-grid">
+                {% for user, rating, created_at in ratings %}
                 <div class="rating-card">
                     <div class="rating-user">{{ user }}</div>
                     <div class="rating-score">
@@ -491,6 +376,12 @@
                 </div>
                 {% endfor %}
             </div>
+            {% else %}
+            <div class="empty-ratings">
+                <h3>No ratings yet</h3>
+                <p>Be the first to rate this movie!</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -524,40 +415,6 @@
             ratingBars.forEach(bar => observer.observe(bar));
         }
 
-        // Calculate and update statistics
-        function updateStats() {
-            const ratingCards = document.querySelectorAll('.rating-card');
-            const ratings = [];
-            
-            ratingCards.forEach(card => {
-                const scoreText = card.querySelector('.rating-score').textContent;
-                const rating = parseFloat(scoreText.split('/')[0]);
-                ratings.push(rating);
-            });
-
-            if (ratings.length > 0) {
-                const average = (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1);
-                const highest = Math.max(...ratings).toFixed(1);
-                
-                document.getElementById('avgRating').textContent = average;
-                document.getElementById('totalRatings').textContent = ratings.length;
-                document.getElementById('highestRating').textContent = highest;
-                document.getElementById('avgRatingMeta').textContent = average + '/10';
-            }
-        }
-
-        // Add loading state for images
-        function setupImageLoading() {
-            const images = document.querySelectorAll('img');
-            images.forEach(img => {
-                img.addEventListener('load', () => {
-                    img.style.opacity = '1';
-                });
-                img.style.opacity = '0';
-                img.style.transition = 'opacity 0.3s ease';
-            });
-        }
-
         // Header scroll effect
         function setupHeaderEffects() {
             const header = document.querySelector('header');
@@ -571,13 +428,26 @@
             });
         }
 
+        // Loading animations
+        function setupLoadingAnimations() {
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                img.addEventListener('load', () => {
+                    img.style.opacity = '1';
+                });
+                if (!img.complete) {
+                    img.style.opacity = '0';
+                    img.style.transition = 'opacity 0.3s ease';
+                }
+            });
+        }
+
         // Initialize everything
         document.addEventListener('DOMContentLoaded', () => {
             setupParallax();
             animateRatingBars();
-            updateStats();
-            setupImageLoading();
             setupHeaderEffects();
+            setupLoadingAnimations();
         });
     </script>
 </body>

@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avocato Movies - Discover Amazing Films</title>
+    <title>Avocato Movies</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" href="./styles/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
 </head>
 <body>
     <!-- Animated background -->
@@ -15,12 +16,11 @@
         <div class="header-content">
             <div class="logo">
                 <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" onerror="this.style.display='none'">
-                <span class="logo-text">Avocato Movies</span>
             </div>
             <nav>
                 <a href="#" onclick="scrollToMovies()">Browse</a>
-                <a href="#">Top Rated</a>
-                <a href="#">New Releases</a>
+                <a href="{{ url_for('top_rated') }}">Top Rated</a>
+                <a href="#about">About</a>
             </nav>
         </div>
     </header>
@@ -37,65 +37,57 @@
         <section>
             <h2 class="section-title" id="moviesSection">Featured Movies</h2>
             <div class="movie-grid" id="movieGrid">
-                <!-- Sample movies for demo - replace with your Flask template -->
-                <div class="movie-tile">
-                    <a href="#">
-                        <div class="movie-poster-container">
-                            <img src="https://images.unsplash.com/photo-1489599388179-0b0c4b5d1d9d?w=300&h=450&fit=crop" alt="Movie 1">
-                            <div class="movie-overlay"></div>
-                            <div class="rating-badge">8.5</div>
-                        </div>
-                        <div class="movie-info">
-                            <h4>The Epic Adventure</h4>
-                        </div>
-                    </a>
+                {% if movies %}
+                    {% for movie in movies %}
+                    <div class="movie-tile" data-title="{{ movie[1].lower() }}">
+                        <a href="{{ url_for('movie_detail', movie_id=movie[0]) }}">
+                            <div class="movie-poster-container">
+                                <img src="{{ url_for('static', filename='movie_posters/' + movie[1] + '.jpg') }}" 
+                                     alt="{{ movie[1].replace('_', ' ').title() }}"
+                                     onerror="this.src='{{ url_for('static', filename='placeholder.jpg') }}'">
+                                <div class="movie-overlay"></div>
+                                {% if movie[3] %}
+                                <div class="rating-badge">{{ movie[3] }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="movie-info">
+                                <h4>{{ movie[1].replace('_', ' ').title() }}</h4>
+                                {% if movie[4] > 0 %}
+                                <p class="rating-count">{{ movie[4] }} review{{ 's' if movie[4] != 1 else '' }}</p>
+                                {% else %}
+                                <p class="rating-count">No reviews yet</p>
+                                {% endif %}
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="no-movies">
+                    <h3>No movies found</h3>
+                    <p>Check back later for more movies!</p>
                 </div>
-                
-                <div class="movie-tile">
-                    <a href="#">
-                        <div class="movie-poster-container">
-                            <img src="https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=300&h=450&fit=crop" alt="Movie 2">
-                            <div class="movie-overlay"></div>
-                            <div class="rating-badge">9.2</div>
-                        </div>
-                        <div class="movie-info">
-                            <h4>Midnight Mystery</h4>
-                        </div>
-                    </a>
-                </div>
+                {% endif %}
+            </div>
+        </section>
 
-                <div class="movie-tile">
-                    <a href="#">
-                        <div class="movie-poster-container">
-                            <img src="https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=300&h=450&fit=crop" alt="Movie 3">
-                            <div class="movie-overlay"></div>
-                            <div class="rating-badge">7.8</div>
-                        </div>
-                        <div class="movie-info">
-                            <h4>Space Odyssey</h4>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="movie-tile">
-                    <a href="#">
-                        <div class="movie-poster-container">
-                            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=300&h=450&fit=crop" alt="Movie 4">
-                            <div class="movie-overlay"></div>
-                            <div class="rating-badge">8.9</div>
-                        </div>
-                        <div class="movie-info">
-                            <h4>Urban Romance</h4>
-                        </div>
-                    </a>
-                </div>
+        <!-- About section -->
+        <section id="about" class="about-section">
+            <div class="about-content">
+                <h2 class="section-title">About Avocato Movies</h2>
+                <p>WE WATCH, WE RATE.</p>
             </div>
         </section>
     </div>
-    <script type="module" src="./static/js/particles.js" defer></script>
-    <script type="module" src="./static/js/search.js" defer></script>
-    <script>
 
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Avocato Movies</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/particles.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+    <script>
         // Smooth scroll to movies section
         function scrollToMovies() {
             document.getElementById('moviesSection').scrollIntoView({
@@ -116,19 +108,109 @@
             });
         }
 
+        // Enhanced search functionality
+        function setupEnhancedSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const movieTiles = document.querySelectorAll('.movie-tile');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const searchTerm = e.target.value.toLowerCase().trim();
+                
+                searchTimeout = setTimeout(() => {
+                    movieTiles.forEach(tile => {
+                        const movieTitle = tile.dataset.title;
+                        if (movieTitle.includes(searchTerm)) {
+                            tile.style.display = 'block';
+                            tile.style.animation = 'fadeIn 0.5s ease';
+                        } else {
+                            tile.style.display = 'none';
+                        }
+                    });
+                    
+                    // Show "no results" message if needed
+                    const visibleTiles = Array.from(movieTiles).filter(tile => 
+                        tile.style.display !== 'none'
+                    );
+                    
+                    let noResultsMsg = document.querySelector('.no-results');
+                    if (visibleTiles.length === 0 && searchTerm) {
+                        if (!noResultsMsg) {
+                            noResultsMsg = document.createElement('div');
+                            noResultsMsg.className = 'no-results';
+                            noResultsMsg.innerHTML = '<h3>No movies found</h3><p>Try a different search term</p>';
+                            document.getElementById('movieGrid').appendChild(noResultsMsg);
+                        }
+                    } else if (noResultsMsg) {
+                        noResultsMsg.remove();
+                    }
+                }, 300);
+            });
+        }
+
         // Initialize everything
         document.addEventListener('DOMContentLoaded', () => {
             createParticles();
-            setupSearch();
             setupScrollEffects();
+            setupEnhancedSearch();
         });
 
-        // Add CSS for fade-in animation
+        // Add CSS for animations
         const style = document.createElement('style');
         style.textContent = `
             @keyframes fadeIn {
                 from { opacity: 0; transform: translateY(20px); }
                 to { opacity: 1; transform: translateY(0); }
+            }
+            
+            .no-results {
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 3rem;
+                color: var(--text-secondary);
+            }
+            
+            .no-movies {
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 3rem;
+                color: var(--text-secondary);
+            }
+            
+            .rating-count {
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+                margin-top: 0.5rem;
+            }
+            
+            .about-section {
+                margin-top: 4rem;
+                padding: 3rem 0;
+                text-align: center;
+            }
+            
+            .about-content p {
+                color: var(--text-secondary);
+                font-size: 1.1rem;
+                max-width: 600px;
+                margin: 0 auto;
+                line-height: 1.6;
+            }
+            
+            footer {
+                background: var(--secondary-bg);
+                border-top: 1px solid rgba(255, 107, 53, 0.2);
+                padding: 2rem 0;
+                margin-top: 4rem;
+            }
+            
+            .footer-content {
+                max-width: 1400px;
+                margin: 0 auto;
+                text-align: center;
+                color: var(--text-secondary);
+                padding: 0 2rem;
             }
         `;
         document.head.appendChild(style);
