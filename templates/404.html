@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Not Found - Avocato Movies</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="bg-animation" id="bgAnimation"></div>
+
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <a href="/">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" onerror="this.style.display='none'">
+                </a>
+                <span class="logo-text">Avocato Movies</span>
+            </div>
+            <nav>
+                <a href="/">Browse</a>
+                <a href="{{ url_for('top_rated') }}">Top Rated</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="error-container">
+        <div class="error-content">
+            <div class="error-visual">
+                <span class="error-code">404</span>
+                <div class="error-icon">🎬</div>
+            </div>
+            <h1>Movie Not Found</h1>
+            <p>Sorry, the movie you're looking for seems to have gone off-screen. It might have been removed or the link might be incorrect.</p>
+            
+            <div class="error-actions">
+                <a href="/" class="btn btn-primary">Browse All Movies</a>
+                <a href="{{ url_for('top_rated') }}" class="btn btn-secondary">View Top Rated</a>
+            </div>
+
+            <div class="error-suggestions">
+                <h3>What can you do?</h3>
+                <ul>
+                    <li>Check if you typed the URL correctly</li>
+                    <li>Browse our full movie collection</li>
+                    <li>Search for a specific movie</li>
+                    <li>Check out our top-rated films</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/particles.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+        });
+    </script>
+
+    <style>
+        .error-container {
+            min-height: calc(100vh - 100px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .error-content {
+            text-align: center;
+            max-width: 600px;
+            background: rgba(37, 37, 37, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            border: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+        .error-visual {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .error-code {
+            font-size: 6rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--accent-color), var(--accent-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            display: block;
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            margin-top: 1rem;
+            opacity: 0.7;
+        }
+
+        .error-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .error-content p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all var(--transition-medium);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--accent-color), var(--accent-hover));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .error-suggestions {
+            text-align: left;
+            background: rgba(26, 26, 26, 0.6);
+            padding: 1.5rem;
+            border-radius: var(--border-radius-small);
+            border: 1px solid rgba(255, 107, 53, 0.1);
+        }
+
+        .error-suggestions h3 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .error-suggestions ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .error-suggestions li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .error-suggestions li:before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .error-content {
+                padding: 2rem;
+            }
+
+            .error-code {
+                font-size: 4rem;
+            }
+
+            .error-content h1 {
+                font-size: 2rem;
+            }
+
+            .error-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                padding: 0.8rem 1.5rem;
+            }
+        }
+    </style>
+</body>
+</html>

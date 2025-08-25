@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Rated Movies - Avocato Movies</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <!-- Animated background -->
+    <div class="bg-animation" id="bgAnimation"></div>
+
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <a href="/">
+                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" onerror="this.style.display='none'">
+                </a>
+            </div>
+            <nav>
+                <a href="/">Browse</a>
+                <a href="{{ url_for('top_rated') }}" class="active">Top Rated</a>
+                <a href="/#about">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h1>🏆 Top Rated Movies</h1>
+        <p>Discover the highest-rated films according to our community</p>
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search top rated movies..." id="searchInput">
+        </div>
+    </div>
+
+    <div class="container">
+        <section>
+            <div class="section-header">
+                <h2 class="section-title" id="moviesSection">Highest Rated Films</h2>
+                <div class="section-stats">
+                    <span class="stat-badge">{{ movies|length }} Movies</span>
+                    <span class="stat-badge">⭐ 6.0+ Rating</span>
+                </div>
+            </div>
+
+            {% if movies %}
+            <div class="movie-grid ranking-grid" id="movieGrid">
+                {% for movie in movies %}
+                <div class="movie-tile ranking-tile" data-title="{{ movie[1].lower() }}" data-rank="{{ loop.index }}">
+                    <div class="rank-badge">#{{ loop.index }}</div>
+                    <a href="{{ url_for('movie_detail', movie_id=movie[0]) }}">
+                        <div class="movie-poster-container">
+                            <img src="{{ url_for('static', filename='movie_posters/' + movie[1] + '.jpg') }}" 
+                                 alt="{{ movie[1].replace('_', ' ').title() }}"
+                                 onerror="this.src='{{ url_for('static', filename='placeholder.jpg') }}'">
+                            <div class="movie-overlay">
+                                <div class="overlay-content">
+                                    <div class="rating-display">
+                                        <span class="rating-number">{{ movie[3] }}</span>
+                                        <span class="rating-max">/10</span>
+                                    </div>
+                                    <div class="review-count">{{ movie[4] }} review{{ 's' if movie[4] != 1 else '' }}</div>
+                                </div>
+                            </div>
+                            <div class="rating-badge featured">{{ movie[3] }}</div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>{{ movie[1].replace('_', ' ').title() }}</h4>
+                            <div class="movie-stats">
+                                <span class="rating-stars">
+                                    {% set rating = movie[3] %}
+                                    {% for i in range(5) %}
+                                        {% if rating >= (i+1)*2 %}
+                                            <span class="star filled">★</span>
+                                        {% elif rating >= (i+1)*2 - 1 %}
+                                            <span class="star half">★</span>
+                                        {% else %}
+                                            <span class="star empty">☆</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                                <span class="review-count-text">{{ movie[4] }} reviews</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-movies">
+                <h3>No top-rated movies yet</h3>
+                <p>Movies need at least 2 ratings to appear here. <a href="/">Browse all movies</a> to start rating!</p>
+            </div>
+            {% endif %}
+
+        </section>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Avocato Movies</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/particles.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/search.js') }}"></script>
+    <script>
+        // Enhanced animations for ranking page
+        function setupRankingAnimations() {
+            const tiles = document.querySelectorAll('.ranking-tile');
+            
+            // Staggered entrance animation
+            tiles.forEach((tile, index) => {
+                tile.style.opacity = '0';
+                tile.style.transform = 'translateY(30px)';
+                
+                setTimeout(() => {
+                    tile.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    tile.style.opacity = '1';
+                    tile.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        }
+
+        // Highlight top 3 movies
+        function highlightTopMovies() {
+            document.querySelectorAll('.ranking-tile[data-rank]').forEach(tile => {
+                const rank = parseInt(tile.dataset.rank);
+                if (rank <= 3) {
+                    tile.classList.add(`top-${rank}`);
+                }
+            });
+        }
+
+        // Smooth scroll to movies section
+        function scrollToMovies() {
+            document.getElementById('moviesSection').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            createParticles();
+            setTimeout(setupRankingAnimations, 300);
+            highlightTopMovies();
+            
+            // Header scroll effect
+            const header = document.querySelector('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 100) {
+                    header.style.background = 'rgba(10, 10, 10, 0.95)';
+                } else {
+                    header.style.background = 'rgba(26, 26, 26, 0.95)';
+                }
+            });
+        });
+    </script>
+
+    <style>
+        /* Additional styles for top rated page */
+        .hero h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .section-stats {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--accent-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 107, 53, 0.3);
+        }
+
+        .ranking-grid {
+            position: relative;
+        }
+
+        .ranking-tile {
+            position: relative;
+        }
+
+        .rank-badge {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: linear-gradient(45deg, var(--accent-color), var(--accent-hover));
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            z-index: 10;
+            box-shadow: var(--shadow-medium);
+            border: 2px solid var(--primary-bg);
+        }
+
+        .rating-badge.featured {
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            color: #000;
+            font-weight: 700;
+        }
+
+        .overlay-content {
+            text-align: center;
+        }
+
+        .rating-display {
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .rating-max {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .movie-stats {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            font-size: 1rem;
+            transition: color var(--transition-fast);
+        }
+
+        .star.filled {
+            color: #ffd700;
+        }
+
+        .star.half {
+            color: #ffd700;
+            opacity: 0.6;
+        }
+
+        .star.empty {
+            color: var(--text-muted);
+        }
+
+        .review-count-text {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        /* Top 3 highlighting */
+        .top-1 .rank-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4a);
+            color: #000;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .top-2 .rank-badge {
+            background: linear-gradient(45deg, #c0c0c0, #e8e8e8);
+            color: #000;
+            transform: scale(1.05);
+        }
+
+        .top-3 .rank-badge {
+            background: linear-gradient(45deg, #cd7f32, #daa520);
+            color: #fff;
+            transform: scale(1.02);
+        }
+
+        .rating-legend {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: rgba(37, 37, 37, 0.5);
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .rating-legend h3 {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .legend-items {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .legend-badge.excellent {
+            background: linear-gradient(45deg, #4ade80, #22c55e);
+            color: white;
+        }
+
+        .legend-badge.great {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .legend-badge.good {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .legend-badge.decent {
+            background: linear-gradient(45deg, #6b7280, #4b5563);
+            color: white;
+        }
+
+        nav a.active {
+            color: var(--accent-color);
+        }
+
+        nav a.active::after {
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .legend-items {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .rank-badge {
+                width: 35px;
+                height: 35px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</body>
+</html>
