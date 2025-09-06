@@ -4,11 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ movie.title.replace('_', ' ').title() }} - Avocato Movies</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <style>
-        /* Optimized styles with reduced animations and better performance */
+        /* Performance-optimized styles */
+        :root {
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --accent-color: #ff6b35;
+            --border-radius: 12px;
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #262626;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Simplified background - no blur or fixed attachment */
         .background-container {
             position: fixed;
             top: 0;
@@ -16,52 +40,94 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            overflow: hidden;
-            will-change: auto; /* Remove will-change to reduce GPU usage */
+            background: linear-gradient(135deg, 
+                var(--bg-primary) 0%,
+                var(--bg-secondary) 50%,
+                var(--bg-primary) 100%);
         }
 
-        .background-image {
-            width: 100%;
-            height: 100%;
-            background-image: url("{{ url_for('static', filename='movie_posters/' + movie.poster_filename + '.jpg') }}");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            filter: blur(20px) brightness(0.3);
-            /* Removed transform and transition for better performance */
-        }
-
-        .background-overlay {
-            position: absolute;
+        /* Header - simplified */
+        header {
+            position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, 
-                rgba(10, 10, 10, 0.9) 0%,
-                rgba(26, 26, 26, 0.85) 50%,
-                rgba(10, 10, 10, 0.95) 100%);
+            right: 0;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.95);
+            border-bottom: 1px solid rgba(255, 107, 53, 0.2);
+            transition: background-color 0.3s ease;
         }
 
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo img {
+            height: 32px;
+            width: auto;
+        }
+
+        .logo-text {
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        nav {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        nav a:hover {
+            color: var(--accent-color);
+        }
+
+        .back-btn {
+            background: rgba(255, 107, 53, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 107, 53, 0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 2rem 2rem;
+        }
+
+        /* Movie hero section - simplified grid */
         .movie-hero {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 3rem;
-            margin-bottom: 3rem;
-            align-items: start;
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            align-items: flex-start;
         }
 
         .poster-container {
-            position: relative;
+            flex-shrink: 0;
+            width: 250px;
             border-radius: var(--border-radius);
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            /* Simplified transition */
-            transition: transform 0.2s ease;
-        }
-
-        .poster-container:hover {
-            transform: translateY(-3px); /* Reduced movement */
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
         }
 
         .poster-container img {
@@ -71,25 +137,23 @@
         }
 
         .movie-info {
-            padding: 1rem 0;
+            flex: 1;
+            min-width: 0;
         }
 
         .movie-title {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, var(--text-primary), var(--accent-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin: 0 0 1rem 0;
+            color: var(--text-primary);
             line-height: 1.2;
         }
 
         .movie-meta {
             display: flex;
             flex-wrap: wrap;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .meta-item {
@@ -97,47 +161,45 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 1rem;
-            background: rgba(37, 37, 37, 0.9);
+            background: var(--bg-card);
             border-radius: 20px;
             font-size: 0.9rem;
-            /* Removed backdrop-filter for better performance */
         }
 
         .rt-link {
             display: inline-block;
-            background: linear-gradient(45deg, var(--accent-color), #ff8c42);
+            background: var(--accent-color);
             color: white;
-            padding: 0.8rem 2rem;
-            border-radius: 25px;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
             text-decoration: none;
             font-weight: 600;
-            transition: transform 0.2s ease;
-            box-shadow: 0 4px 20px rgba(255, 107, 53, 0.2);
+            transition: background-color 0.2s ease;
             margin-top: 1rem;
         }
 
         .rt-link:hover {
-            transform: translateY(-2px);
+            background: #e55a2b;
         }
 
+        /* Stats - simplified layout */
         .stats-summary {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
             margin-bottom: 2rem;
         }
 
         .stat-item {
             text-align: center;
-            padding: 1.5rem;
-            background: rgba(26, 26, 26, 0.8);
+            padding: 1rem;
+            background: var(--bg-card);
             border-radius: var(--border-radius);
             border: 1px solid rgba(255, 107, 53, 0.2);
-            /* Removed backdrop-filter */
         }
 
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--accent-color);
             margin-bottom: 0.5rem;
@@ -145,35 +207,37 @@
 
         .stat-label {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
+        /* Ratings section - simplified */
         .ratings-section {
-            background: rgba(37, 37, 37, 0.9);
+            background: var(--bg-secondary);
             border-radius: var(--border-radius);
-            padding: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
             border: 1px solid rgba(255, 107, 53, 0.2);
-            /* Removed backdrop-filter */
+        }
+
+        .section-title {
+            margin: 0 0 1.5rem 0;
+            font-size: 1.5rem;
+            font-weight: 600;
         }
 
         .ratings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 1rem;
         }
 
         .rating-card {
-            background: rgba(26, 26, 26, 0.9);
-            border: 1px solid rgba(255, 107, 53, 0.3);
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 107, 53, 0.2);
             border-radius: var(--border-radius);
-            padding: 1.5rem;
-            /* Simplified transition */
-            transition: transform 0.2s ease, border-color 0.2s ease;
+            padding: 1rem;
             position: relative;
-            overflow: hidden;
         }
 
         .rating-card::before {
@@ -182,24 +246,18 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-color), #ff8c42);
-        }
-
-        .rating-card:hover {
-            transform: translateY(-3px); /* Reduced movement */
-            border-color: var(--accent-color);
+            height: 2px;
+            background: var(--accent-color);
         }
 
         .rating-user {
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 0.5rem;
-            font-size: 1.1rem;
         }
 
         .rating-score {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--accent-color);
             display: flex;
@@ -208,66 +266,54 @@
         }
 
         .rating-score .out-of {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
             font-weight: 400;
         }
 
         .rating-bar {
             width: 100%;
-            height: 6px;
+            height: 4px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            margin-top: 1rem;
+            border-radius: 2px;
+            margin-top: 0.5rem;
             overflow: hidden;
         }
 
         .rating-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--accent-color), #ff8c42);
-            border-radius: 3px;
-            /* Faster transition */
-            transition: width 0.6s ease;
+            background: var(--accent-color);
+            border-radius: 2px;
+            transition: width 0.8s ease;
         }
 
         .empty-ratings {
             text-align: center;
-            padding: 3rem;
+            padding: 2rem;
             color: var(--text-secondary);
         }
 
         .empty-ratings h3 {
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
-        /* Performance optimizations for mobile */
-        @media (max-width: 968px) {
-            .background-image {
-                background-attachment: scroll; /* Better performance on mobile */
-            }
-            
-            .movie-hero {
-                grid-template-columns: 250px 1fr;
-                gap: 2rem;
-            }
-            
-            .movie-title {
-                font-size: 2.5rem;
-            }
-            
-            .stats-summary {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
+        /* Mobile optimization */
         @media (max-width: 768px) {
+            .container {
+                padding: 80px 1rem 1rem;
+            }
+            
+            .header-content {
+                padding: 1rem;
+            }
+            
             .movie-hero {
-                grid-template-columns: 1fr;
+                flex-direction: column;
                 text-align: center;
             }
             
             .poster-container {
-                max-width: 300px;
+                width: 200px;
                 margin: 0 auto;
             }
             
@@ -277,7 +323,6 @@
             
             .stats-summary {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
             }
             
             .ratings-grid {
@@ -286,45 +331,51 @@
         }
 
         @media (max-width: 480px) {
+            .movie-title {
+                font-size: 1.5rem;
+            }
+            
             .stats-summary {
                 grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .stat-item {
+                padding: 0.8rem;
+            }
+            
+            .ratings-section {
+                padding: 1rem;
             }
         }
 
-        /* Disable animations for users who prefer reduced motion */
+        /* Reduced motion support */
         @media (prefers-reduced-motion: reduce) {
             * {
                 animation-duration: 0.01ms !important;
                 animation-iteration-count: 1 !important;
                 transition-duration: 0.01ms !important;
             }
-            
-            .background-image {
-                filter: blur(10px) brightness(0.4); /* Reduced blur */
-            }
         }
 
-        /* Performance hint for the browser */
-        .poster-container,
-        .rating-card,
-        .stat-item {
-            contain: layout style paint;
+        /* Performance optimizations */
+        img {
+            content-visibility: auto;
+        }
+        
+        .ratings-grid {
+            content-visibility: auto;
+            contain-intrinsic-size: 300px;
         }
     </style>
 </head>
 <body>
-    <!-- Simplified background (no particles on detail page) -->
-    <div class="background-container">
-        <div class="background-image"></div>
-        <div class="background-overlay"></div>
-    </div>
+    <div class="background-container"></div>
 
     <header>
         <div class="header-content">
             <div class="logo">
-                <a href="/">
-                    <img src="{{ url_for('static', filename='logo.png') }}" alt="Avocato Movies Logo" onerror="this.style.display='none'">
-                </a>
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Avocato Movies Logo" onerror="this.style.display='none'">
                 <span class="logo-text">Movie Detail</span>
             </div>
             <nav>
@@ -415,32 +466,26 @@
     </div>
 
     <script>
-        // Optimized and simplified JavaScript
+        // Minimal, performance-focused JavaScript
         
-        // Efficient header scroll effect with throttling
-        let ticking = false;
-        function updateHeader() {
-            const header = document.querySelector('header');
-            if (window.scrollY > 100) {
-                header.style.background = 'rgba(10, 10, 10, 0.98)';
-            } else {
-                header.style.background = 'rgba(26, 26, 26, 0.95)';
-            }
-            ticking = false;
+        // Throttled scroll handler
+        let scrollTimeout = null;
+        function handleScroll() {
+            if (scrollTimeout) return;
+            
+            scrollTimeout = setTimeout(() => {
+                const header = document.querySelector('header');
+                const opacity = window.scrollY > 50 ? '0.98' : '0.95';
+                header.style.backgroundColor = `rgba(10, 10, 10, ${opacity})`;
+                scrollTimeout = null;
+            }, 16); // ~60fps
         }
 
-        function requestHeaderUpdate() {
-            if (!ticking) {
-                requestAnimationFrame(updateHeader);
-                ticking = true;
-            }
-        }
+        window.addEventListener('scroll', handleScroll, { passive: true });
 
-        window.addEventListener('scroll', requestHeaderUpdate, { passive: true });
-
-        // Optimized rating bar animations using Intersection Observer
-        function animateRatingBars() {
-            const ratingBars = document.querySelectorAll('.rating-fill');
+        // Simple rating bar animation using Intersection Observer
+        function initRatingBars() {
+            const bars = document.querySelectorAll('.rating-fill');
             
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -448,47 +493,25 @@
                         const bar = entry.target;
                         const width = bar.dataset.width;
                         
-                        // Use a small delay to ensure smooth animation
+                        // Animate after a small delay
                         setTimeout(() => {
                             bar.style.width = width;
-                        }, 150);
+                        }, 100);
                         
-                        observer.unobserve(bar); // Stop observing once animated
+                        observer.unobserve(bar);
                     }
                 });
-            }, { 
-                threshold: 0.3,
-                rootMargin: '0px 0px -10% 0px'
-            });
+            }, { threshold: 0.5 });
 
-            ratingBars.forEach(bar => observer.observe(bar));
+            bars.forEach(bar => observer.observe(bar));
         }
 
-        // Optimized image loading
-        function setupImageLoading() {
-            const images = document.querySelectorAll('img[loading="lazy"]');
-            
-            images.forEach(img => {
-                if (img.complete) {
-                    img.style.opacity = '1';
-                } else {
-                    img.style.opacity = '0';
-                    img.style.transition = 'opacity 0.3s ease';
-                    
-                    img.addEventListener('load', () => {
-                        img.style.opacity = '1';
-                    }, { once: true });
-                }
-            });
+        // Initialize on DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initRatingBars);
+        } else {
+            initRatingBars();
         }
-
-        // Initialize everything efficiently
-        document.addEventListener('DOMContentLoaded', () => {
-            setupImageLoading();
-            
-            // Delay rating animation to improve perceived performance
-            setTimeout(animateRatingBars, 300);
-        });
     </script>
 </body>
 </html>
